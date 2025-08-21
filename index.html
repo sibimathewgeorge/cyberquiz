@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Hack Challenge</title>
+  <title>Cyber Voice Hack Challenge</title>
   <style>
     body {
       margin: 0;
@@ -58,6 +58,21 @@
       margin: 20px auto;
     }
 
+    #champion-image {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
+      border-radius: 15px;
+      margin: 20px auto;
+      box-shadow: 0 0 25px #ffd700;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 25px #ffd700; }
+      to { box-shadow: 0 0 35px #ffd700, 0 0 45px #ffd700; }
+    }
+
     h2 {
       font-size: 1.5rem;
     }
@@ -74,214 +89,204 @@
       color: #00ffcc;
     }
 
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+    button {
+      padding: 10px 20px;
       margin-top: 20px;
-    }
-
-    .option {
-      padding: 15px;
       background-color: #00ffcc;
       color: black;
       border: none;
       border-radius: 10px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
-      text-align: left;
     }
 
-    .option::before {
-      content: attr(data-label) ". ";
+    .champion-text {
+      color: #ffd700;
+      font-size: 2rem;
       font-weight: bold;
-    }
-
-    #restart-btn {
-      display: none;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
 
-<div id="splash">
-  <img src="images/title.png" alt="Cyber Hack Challenge" />
-  <button onclick="startQuiz()">🔊 Start Quiz</button>
-</div>
+  <!-- Splash Title -->
+  <div id="splash">
+    <img src="images/title.png" alt="Cyber Voice Hack Challenge" />
+    <button onclick="startQuiz()">🎤 Start Quiz</button>
+  </div>
 
-<div id="quiz-container">
-  <img id="quiz-image" class="question" src="" alt="Cybersecurity Question" />
-  <h2 id="question-text"></h2>
-  <div id="score">Score: 0</div>
-  <div id="timer">⏳ Time Left: 15s</div>
-  <div class="options" id="options-container"></div>
-  <div id="answer-status"></div>
-  <button id="restart-btn" onclick="startQuiz()">🔁 Play Again</button>
-</div>
+  <!-- Quiz Container -->
+  <div id="quiz-container">
+    <img id="quiz-image" class="question" src="" alt="Cybersecurity Question" />
+    <h2 id="question-text">Identify the vulnerability shown</h2>
+    <div id="score">Score: 0</div>
+    <div id="timer">⏳ Time Left: 30s</div>
+    <div id="answer-status">Listening...</div>
+    <button id="restart-btn" onclick="startQuiz()" style="display: none;">🔄 Play Again</button>
+  </div>
 
-<audio id="winner-sound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+  <!-- Winner Sound Only -->
+  <audio id="winner-sound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
 
-<script>
-const fullQuestionBank = [
-  { img: "images/sqli.jpg", correct: "SQL Injection", options: ["SQL Injection", "XSS", "Phishing", "DoS"], synonyms: ["sql injection", "sql", "database injection", "sequel injection", "sqli", "sequel"] },
-  { img: "images/csrf.jpg", correct: "Cross Site Request Forgery", options: ["SQL Injection", "Cross Site Request Forgery", "IDOR", "Phishing"], synonyms: ["csrf", "cross site forgery", "cross", "cross site", "request", "forgery"] },
-  { img: "images/xss.jpg", correct: "Cross Site Scripting", options: ["Broken Authentication", "Cross Site Scripting", "CSRF", "Phishing"], synonyms: ["xss", "cross site", "cross"] },
-  { img: "images/idor.jpg", correct: "Insecure Direct Object Reference", options: ["DoS", "Insecure Direct Object Reference", "XSS", "CSRF"], synonyms: ["idor", "insecure object reference", "i door", "eye door"] },
-  { img: "images/auth.jpg", correct: "Broken Authentication", options: ["DoS", "Broken Authentication", "Man in the Middle", "SQL Injection"], synonyms: ["broken authentication", "auth failure", "login flaw", "authentication failure"] },
-  { img: "images/ssrf.jpg", correct: "Server Side Request Forgery", options: ["CSRF", "XSS", "Server Side Request Forgery", "Phishing"], synonyms: ["ssrf", "server side forgery", "server", "server side"] },
-  { img: "images/phishing.jpg", correct: "Phishing", options: ["Phishing", "XSS", "SQL Injection", "Broken Access"], synonyms: ["email fraud", "spoofing", "fishing"] },
-  { img: "images/data.jpg", correct: "Sensitive Data Exposure", options: ["Sensitive Data Exposure", "DoS", "Broken Auth", "Phishing"], synonyms: ["data exposure", "sensitive data leak", "data leak", "sensitive"] },
-  { img: "images/iaaf.jpg", correct: "Identification and Authentication Failure", options: ["CSRF", "IDOR", "Identification and Authentication Failure", "XSS"], synonyms: ["authentication failure", "auth fail", "identification failure", "identification"] },
-  { img: "images/insecure.jpg", correct: "Insecure Design", options: ["Phishing", "XSS", "Insecure Design", "Broken Auth"], synonyms: ["bad design", "weak architecture", "insecure", "design"] }
-];
+  <script>
+    const questions = [
+      { 
+        img: "images/sqli.jpg",
+        question: "What type of attack allows attackers to manipulate database queries through user input?",
+        a: ["sql injection", "sqli", "structured query language injection", "sqli attack", "SQL injection"] 
+      },
+      { 
+        img: "images/https.jpg",
+        question: "Which protocol is secure ?",
+        a: ["https", "hypertext transfer protocol secure", "hyper text transfer protocol secure", "HTTPS"] 
+      },
+      { 
+        img: "images/ransomeware.jpg",
+        question: "What type of malware encrypts victim's files and demands payment for decryption?",
+        a: ["ransomware", "ran somewhere", "ransome where"] 
+      },
+      { 
+        img: "images/mitm.jpg",
+        question: "What attack involves intercepting communications between two parties without their knowledge?",
+        a: ["man in the middle", "mitm", "MITM", "man in the middle attack", "man inthe middle","man inthe middle attack"] 
+      },
+      { 
+        img: "images/phishing.jpg",
+        question: "What social engineering attack uses fraudulent emails to steal sensitive information?",
+        a: ["phishing", "email scam", "fraud email", "spoof email", "fake login page"] 
+      }
+    ];
 
-let questions = [], current = 0, score = 0, timer, timeLeft = 15;
+    let current = 0, score = 0, timer, timeLeft = 30;
+    let recognition, recognitionActive = false;
 
-const splash = document.getElementById("splash"),
-      quizContainer = document.getElementById("quiz-container"),
-      quizImage = document.getElementById("quiz-image"),
-      questionText = document.getElementById("question-text"),
-      answerStatus = document.getElementById("answer-status"),
-      scoreDisplay = document.getElementById("score"),
-      timerDisplay = document.getElementById("timer"),
-      restartBtn = document.getElementById("restart-btn"),
-      optionsContainer = document.getElementById("options-container"),
-      winnerSound = document.getElementById("winner-sound");
+    const splash = document.getElementById("splash"),
+          quizContainer = document.getElementById("quiz-container"),
+          quizImage = document.getElementById("quiz-image"),
+          questionText = document.getElementById("question-text"),
+          answerStatus = document.getElementById("answer-status"),
+          scoreDisplay = document.getElementById("score"),
+          timerDisplay = document.getElementById("timer"),
+          restartBtn = document.getElementById("restart-btn"),
+          winnerSound = document.getElementById("winner-sound");
 
-let recognition;
-if ('webkitSpeechRecognition' in window) {
-  recognition = new webkitSpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.continuous = true;
-  recognition.interimResults = false;
-  recognition.onresult = (event) => {
-    const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-    handleAnswer(transcript);
-  };
-}
-
-function normalize(text) {
-  return text.trim().toLowerCase();
-}
-
-function isCorrectAnswer(input, correct, synonyms) {
-  const normInput = normalize(input);
-  const allAcceptable = [normalize(correct), ...synonyms.map(s => normalize(s))];
-  return allAcceptable.some(ans => normInput.includes(ans) || ans.includes(normInput));
-}
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-function startQuiz() {
-  splash.style.display = "none";
-  quizContainer.style.display = "block";
-  current = 0;
-  score = 0;
-  scoreDisplay.textContent = "Score: 0";
-  answerStatus.textContent = "";
-  timerDisplay.style.display = "block";
-  quizImage.style.display = "block";
-  restartBtn.style.display = "none";
-  questions = [...fullQuestionBank];
-  shuffle(questions);
-  questions = questions.slice(0, 5);
-  speak("Let's begin the quiz!");
-  if (recognition) recognition.start();
-  showQuestion();
-}
-
-function showQuestion() {
-  if (current >= questions.length) {
-    quizImage.style.display = "block";
-    optionsContainer.innerHTML = "";
-    timerDisplay.style.display = "none";
-    scoreDisplay.textContent = `Final Score: ${score}/${questions.length}`;
-    answerStatus.textContent = "";
-    restartBtn.style.display = "inline-block";
-
-    if (score === questions.length) {
-      quizImage.src = "images/champion.png";
-      questionText.textContent = "🏆 You are a Cyber Champion!";
-      winnerSound.play();
-      speak("Perfect score! You are a cybersecurity champion!");
-    } else if (score === questions.length - 1) {
-      quizImage.src = "images/good.png";
-      questionText.textContent = "👏 Good Job! Almost perfect.";
-      speak("Good job! You scored four out of five.");
-    } else {
-      quizImage.src = "images/try-again.png";
-      questionText.textContent = "🔁 Try Again! You can do better.";
-      speak("Try again! You scored less than four.");
+    function startQuiz() {
+      splash.style.display = "none";
+      quizContainer.style.display = "block";
+      current = 0;
+      score = 0;
+      scoreDisplay.textContent = "Score: 0";
+      answerStatus.textContent = "Listening...";
+      restartBtn.style.display = "none";
+      speak("Let's begin the cybersecurity quiz!");
+      if (!recognition) setupRecognition();
+      showQuestion();
     }
 
-    if (recognition) recognition.stop();
-    return;
-  }
+    function setupRecognition() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.continuous = true;
 
-  const q = questions[current];
-  quizImage.src = q.img;
-  questionText.textContent = "Identify the vulnerability shown.";
-  answerStatus.textContent = "";
+      recognition.onresult = (event) => {
+        const spoken = event.results[event.results.length - 1][0].transcript.toLowerCase().replace(/[^\w\s]/gi, '');
+        const spokenWords = spoken.split(" ");
+        const acceptedAnswers = questions[current].a;
 
-  optionsContainer.innerHTML = "";
-  const labels = ["1", "2", "3", "4"];
-  q.options.forEach((option, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = option;
-    btn.className = "option";
-    btn.setAttribute("data-label", labels[index]);
-    btn.onclick = () => handleAnswer(option.toLowerCase());
-    optionsContainer.appendChild(btn);
-  });
+        const isCorrect = acceptedAnswers.some(answer => {
+          const normalized = answer.toLowerCase();
+          return (
+            spoken.includes(normalized) ||
+            spokenWords.some(word => normalized.includes(word)) ||
+            normalized.split(" ").every(part => spoken.includes(part))
+          );
+        });
 
-  timeLeft = 15;
-  updateTimer();
-  clearInterval(timer);
-  timer = setInterval(() => {
-    timeLeft--;
-    updateTimer();
-    if (timeLeft <= 0) {
+        if (isCorrect) {
+          clearInterval(timer);
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+          answerStatus.textContent = "✅ Correct!";
+          speak("Correct!");
+          current++;
+          setTimeout(showQuestion, 2000);
+        } else {
+          answerStatus.textContent = "❌ Try again...";
+          speak("That's not correct. Try again.");
+        }
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Speech error:", e.error);
+        answerStatus.textContent = `🎤 Error: ${e.error}`;
+      };
+
+      recognition.start();
+      recognitionActive = true;
+    }
+
+    function showQuestion() {
+      if (current >= questions.length) {
+        if (score === questions.length) {
+          // Perfect score - show champion image and message
+          questionText.innerHTML = `<div class="champion-text">🏆 CYBERSECURITY CHAMPION ! 🏆</div>`;
+          quizImage.src = "images/champ.jpg";
+          quizImage.id = "champion-image";
+          answerStatus.textContent = "🎉 Perfect Score Achieved ! 🎉";
+          winnerSound.play();
+          speak("Congratulations! You are a true cybersecurity champion! Perfect score achieved!");
+        } else {
+          questionText.textContent = `🎯 Quiz Complete!`;
+          quizImage.src = "https://via.placeholder.com/400x250/34495e/ffffff?text=QUIZ+COMPLETE";
+          answerStatus.textContent = `Final Score: ${score}/${questions.length}`;
+          speak(`Quiz complete! Your final score is ${score} out of ${questions.length}. ${score >= 3 ? 'Well done!' : 'Keep practicing to improve your cybersecurity knowledge!'}`);
+        }
+        
+        scoreDisplay.textContent = `Final Score: ${score}/${questions.length}`;
+        timerDisplay.textContent = "";
+        restartBtn.style.display = "inline-block";
+        
+        if (recognition && recognitionActive) {
+          recognition.stop();
+          recognitionActive = false;
+        }
+        return;
+      }
+
+      const q = questions[current];
+      quizImage.src = q.img;
+      quizImage.id = "quiz-image";
+      questionText.textContent = q.question;
+      answerStatus.textContent = "Listening...";
+      timeLeft = 30;
+      updateTimer();
       clearInterval(timer);
-      answerStatus.textContent = "⏱️ Time's up!";
-      speak("Time's up!");
-      current++;
-      setTimeout(showQuestion, 2000);
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          answerStatus.textContent = "⏱️ Time's up!";
+          speak("Time's up! Moving to the next question.");
+          current++;
+          setTimeout(showQuestion, 2000);
+        }
+      }, 1000);
     }
-  }, 1000);
-}
 
-function handleAnswer(selected) {
-  clearInterval(timer);
-  const q = questions[current];
-  if (isCorrectAnswer(selected, q.correct, q.synonyms)) {
-    score++;
-    scoreDisplay.textContent = `Score: ${score}`;
-    answerStatus.textContent = "✅ Correct!";
-    speak("Correct!");
-  } else {
-    answerStatus.textContent = "❌ Wrong answer.";
-    speak("Wrong answer.");
-  }
-  current++;
-  setTimeout(showQuestion, 2000);
-}
+    function updateTimer() {
+      timerDisplay.textContent = `⏳ Time Left: ${timeLeft}s`;
+    }
 
-function updateTimer() {
-  timerDisplay.textContent = `⏳ Time Left: ${timeLeft}s`;
-}
-
-function speak(text) {
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.pitch = 1;
-  utter.rate = 1;
-  speechSynthesis.speak(utter);
-}
-</script>
-
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.pitch = 1;
+      utter.rate = 1;
+      speechSynthesis.speak(utter);
+    }
+  </script>
 </body>
 </html>
